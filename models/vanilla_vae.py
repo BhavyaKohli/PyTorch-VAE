@@ -111,7 +111,7 @@ class VanillaVAE(BaseVAE):
 
         return [mu, log_var]
 
-    def decode(self, z: Tensor, do_softmax: bool = False) -> Tensor:
+    def decode(self, z: Tensor) -> Tensor:
         """
         Maps the given latent codes
         onto the image space.
@@ -124,8 +124,6 @@ class VanillaVAE(BaseVAE):
         result = self.decoder(result)
         result = self.final_layer(result)
         result = self.output_layer(result)
-        if do_softmax:
-            result = nn.Softmax(dim=2)(result).permute(0,1,2,3)
         return result
 
     def reparameterize(self, mu: Tensor, logvar: Tensor) -> Tensor:
@@ -144,8 +142,7 @@ class VanillaVAE(BaseVAE):
         if not self.built: raise AttributeError("build model first using model.build") 
         mu, log_var = self.encode(input)
         z = self.reparameterize(mu, log_var)
-        do_softmax = kwargs.get('do_softmax', False)
-        return  [self.decode(z, do_softmax), input, mu, log_var]
+        return  [self.decode(z), input, mu, log_var]
 
     def loss_function(self,
                       *args,
