@@ -161,6 +161,10 @@ class VanillaVAE(BaseVAE):
         mu = args[2]
         log_var = args[3]
 
+        do_softmax = kwargs.get('do_softmax', False)
+        if do_softmax:
+            recons = nn.Softmax(dim=2)(recons).permute(0,1,2,3)
+
         kld_weight = kwargs['M_N'] # Account for the minibatch samples from the dataset
         recons_loss = F.mse_loss(recons, input)
         # recons_loss = F.mse_loss(gops.gumbel_sinkhorn(recons[:,0])[:,None], input)
